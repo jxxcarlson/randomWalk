@@ -5,5 +5,10 @@ up odd, he loses a dollar.
 
 *Install:* Run `sh build.sh`
 
+*Source files:* `src/randomWalk.elm` is the game simulation file.
+It relies on `src/Graph.elm`.  This module is of general use
+for drawing graphs.
+
 *Run:* Open `index.html` in your browser
-
+
+*Image:* the image `randomWalk.jpg` gives an image of one game.
