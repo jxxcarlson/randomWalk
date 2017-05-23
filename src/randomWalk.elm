@@ -191,11 +191,6 @@ view model =
         , div [ messageClass model ] [ text model.message ]
         , svg
             [ SA.width "1200", SA.height "400" ]
-            [ model.history
-                |> List.reverse
-                |> Graph.prepareIntegerSeries
-                |> (Graph.flipSeries 30)
-                |> (Graph.scaleSeries 3 4)
-                |> Graph.render
+            [ graph model
             ]
         ]
