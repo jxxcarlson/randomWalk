@@ -6,8 +6,7 @@ import Html.Events exposing (onClick)
 
 
 type alias Model =
-    { register : Int
-    }
+    { register : Int }
 
 
 initialModel =
