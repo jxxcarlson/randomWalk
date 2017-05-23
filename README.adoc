@@ -1,0 +1,9 @@
+*RandomWalk* is a simulation of a simple dice-playing game.
+The (solitary) player begins with $4 and repeatedly rolls
+a die.  If it comes up even, he wins one dollar. If it comes
+up odd, he loses a dollar.
+
+*Install:* Run `sh build.sh`
+
+*Run:* Open `index.html` in your browser
+

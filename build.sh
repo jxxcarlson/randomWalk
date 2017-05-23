@@ -1,1 +1,1 @@
-elm-make src/randomWalk.elm --output elm.js
+elm-make src/RandomWalk.elm --output elm.js

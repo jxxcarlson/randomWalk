@@ -4,7 +4,7 @@ import Html exposing (..)
 import Html.Events exposing (..)
 import Svg exposing (svg, circle)
 import Svg.Attributes as SA exposing (cx, cy, fill, width, height, r)
-import Graph exposing (render, prepareIntegerSeries, scaleSeries, flipSeries)
+import Graph exposing (render, renderIntegerTimeSeries)
 
 
 -- cx, cy, fill, width, height
@@ -39,6 +39,8 @@ type alias Model =
     , balance : Int
     , history : List Int
     , message : String
+    , graphData : Graph.GraphData
+    , info : String
     }
 
 
@@ -47,8 +49,17 @@ init =
     let
         b =
             4
+
+        source =
+            Graph.Rect 0.0 0.0 200.0 20.0
+
+        target =
+            Graph.Rect 0.0 0.0 800.0 120.0
+
+        g =
+            Graph.GraphData source target "black" "white"
     in
-        ( Model Running 0 1 b b [ b ] "Good luck!", Cmd.none )
+        ( Model Running 0 1 b b [ b ] "Good luck!" g "Simulator on!", Cmd.none )
 
 
 
@@ -58,6 +69,7 @@ init =
 type Msg
     = Roll
     | NewFace Int
+    | Reset
 
 
 updateModel : Int -> Model -> Model
@@ -76,6 +88,12 @@ updateModel n model =
                 model.balance + delta
             else
                 model.balance
+
+        newHistory =
+            if model.gameState == Running then
+                newBalance :: model.history
+            else
+                model.history
 
         newGameState =
             if newBalance > 0 then
@@ -99,12 +117,6 @@ updateModel n model =
                     "Keep at it!"
             else
                 "Game Over!"
-
-        newHistory =
-            if newGameState == Running then
-                newBalance :: model.history
-            else
-                model.history
     in
         { model
             | gameState = newGameState
@@ -112,6 +124,7 @@ updateModel n model =
             , register = n
             , balance = newBalance
             , history = newHistory
+            , info = newHistory |> List.take 40 |> List.reverse |> intList2String
             , message = newMessage
         }
 
@@ -125,7 +138,14 @@ update msg model =
         NewFace newFace ->
             ( updateModel newFace model, Cmd.none )
 
+        Reset ->
+            init
 
+
+{-|
+  The next three functions change the color of text elements
+  in accord with the state of the Game
+-}
 dieClass : Model -> Attribute Msg
 dieClass model =
     if model.register % 2 == 0 then
@@ -165,36 +185,22 @@ subscriptions model =
 -- VIEW
 
 
-dataSet =
-    [ ( 20, 100 ), ( 40, 60 ), ( 70, 80 ), ( 100, 20 ) ]
-
-
-transformData kx ky offset color data =
-    data
-        |> Graph.prepareIntegerSeries
-        |> (Graph.flipSeries offset)
-        |> (Graph.scaleSeries kx ky)
-        |> Graph.render color
-
-
+{-|
+  The main graphing function: graphs the current game history
+-}
 graph : Model -> String -> Svg.Svg msg
 graph model color =
     model.history
         |> List.reverse
-        |> transformData 3 4 30 color
+        |> Graph.renderIntegerTimeSeries color model.graphData
 
 
-
--- |> Graph.prepareIntegerSeries
--- |> (Graph.flipSeries 30)
--- |> (Graph.scaleSeries 3 4)
--- |> Graph.render color
-
-
-abscissa : Int -> String -> Svg.Svg msg
-abscissa b color =
-    List.repeat b 0
-        |> transformData 3 4 29.5 color
+{-|
+  intList2String [1, 4, 2, 7] = "1, 4, 2, 7"
+-}
+intList2String : List Int -> String
+intList2String list =
+    List.map toString list |> String.join (", ")
 
 
 view : Model -> Html Msg
@@ -204,12 +210,16 @@ view model =
         , div [ dieClass model ] [ text ("Die " ++ (toString model.register)) ]
         , div [ class "display" ] [ text ("Count " ++ (toString model.count)) ]
         , button [ onClick Roll ] [ text "Roll" ]
+        , button [ onClick Reset, id "reset" ] [ text "Reset" ]
         , br [] []
         , br [] []
         , div [ messageClass model ] [ text model.message ]
+        , p [ id "info" ] [ text model.info ]
         , svg
             [ SA.width "1200", SA.height "400" ]
             [ (graph model "yellow")
-            , (abscissa 300 "white")
+            , (Graph.boundingRect model.graphData)
+            , (Graph.render "red" model.graphData [ ( 0, (toFloat model.initialBalance) ), ( 200.0, (toFloat model.initialBalance) ) ])
+            , (graph model "yellow")
             ]
         ]
