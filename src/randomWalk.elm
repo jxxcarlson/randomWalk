@@ -169,23 +169,32 @@ dataSet =
     [ ( 20, 100 ), ( 40, 60 ), ( 70, 80 ), ( 100, 20 ) ]
 
 
+transformData kx ky offset color data =
+    data
+        |> Graph.prepareIntegerSeries
+        |> (Graph.flipSeries offset)
+        |> (Graph.scaleSeries kx ky)
+        |> Graph.render color
+
+
 graph : Model -> String -> Svg.Svg msg
 graph model color =
     model.history
         |> List.reverse
-        |> Graph.prepareIntegerSeries
-        |> (Graph.flipSeries 30)
-        |> (Graph.scaleSeries 3 4)
-        |> Graph.render color
+        |> transformData 3 4 30 color
+
+
+
+-- |> Graph.prepareIntegerSeries
+-- |> (Graph.flipSeries 30)
+-- |> (Graph.scaleSeries 3 4)
+-- |> Graph.render color
 
 
 abscissa : Int -> String -> Svg.Svg msg
 abscissa b color =
     List.repeat b 0
-        |> Graph.prepareIntegerSeries
-        |> (Graph.flipSeries 29.25)
-        |> (Graph.scaleSeries 3 4)
-        |> (Graph.render color)
+        |> transformData 3 4 29.5 color
 
 
 view : Model -> Html Msg
