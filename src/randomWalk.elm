@@ -169,14 +169,23 @@ dataSet =
     [ ( 20, 100 ), ( 40, 60 ), ( 70, 80 ), ( 100, 20 ) ]
 
 
-graph : Model -> Svg.Svg msg
-graph model =
+graph : Model -> String -> Svg.Svg msg
+graph model color =
     model.history
         |> List.reverse
         |> Graph.prepareIntegerSeries
         |> (Graph.flipSeries 30)
         |> (Graph.scaleSeries 3 4)
-        |> Graph.render
+        |> Graph.render color
+
+
+abscissa : Int -> String -> Svg.Svg msg
+abscissa b color =
+    List.repeat b 0
+        |> Graph.prepareIntegerSeries
+        |> (Graph.flipSeries 29.25)
+        |> (Graph.scaleSeries 3 4)
+        |> (Graph.render color)
 
 
 view : Model -> Html Msg
@@ -191,6 +200,7 @@ view model =
         , div [ messageClass model ] [ text model.message ]
         , svg
             [ SA.width "1200", SA.height "400" ]
-            [ graph model
+            [ (graph model "yellow")
+            , (abscissa 300 "white")
             ]
         ]

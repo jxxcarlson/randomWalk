@@ -87,6 +87,7 @@ data2SVG data =
 --     polyline [ fill "none", stroke "red", points (data2SVG data) ] []
 
 
-render data =
+render : String -> Points -> Svg.Svg msg
+render color data =
     -- polyline [ fill "none", stroke "red", points (data2SVG data) ] []
-    polyline [ fill "none", stroke "yellow", points (data2SVG data) ] []
+    polyline [ fill "none", stroke color, points (data2SVG data) ] []
