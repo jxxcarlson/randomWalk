@@ -7,8 +7,14 @@ up odd, he loses a dollar.
 
 *Source files:* `src/randomWalk.elm` is the game simulation file.
 It relies on `src/Graph.elm`.  This module is of general use
-for drawing graphs.
+for drawing graphs and simple geometric figures using coordinates
+in the Cartesian plane.
 
 *Run:* Open `index.html` in your browser
 
 *Image:* the image `randomWalk.jpg` gives an image of one game.
+
+*About the Graph Library:* The library `Graph.elm` can be used
+for a variety of image-making purposes.  See `src/Composition1.jpg`
+for an example, and see `image/composition1.png` for an image
+produced with this technology.
