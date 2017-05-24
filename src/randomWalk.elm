@@ -2,15 +2,11 @@ module Main exposing (..)
 
 import Html exposing (..)
 import Html.Events exposing (..)
+import Html.Attributes exposing (class, id)
 import Svg exposing (svg, circle)
 import Svg.Attributes as SA exposing (cx, cy, fill, width, height, r)
-import Graph exposing (render, renderIntegerTimeSeries)
-
-
--- cx, cy, fill, width, height
-
-import Html.Attributes exposing (class, id)
 import Random
+import Graph exposing (renderPointList, renderIntegerTimeSeries, line)
 
 
 main =
@@ -34,13 +30,13 @@ type GameState
 type alias Model =
     { gameState : GameState
     , count : Int
-    , register : Int
+    , dieFace : Int
     , initialBalance : Int
     , balance : Int
     , history : List Int
     , message : String
-    , graphData : Graph.GraphData
     , info : String
+    , graphData : Graph.GraphData
     }
 
 
@@ -56,10 +52,10 @@ init =
         target =
             Graph.Rect 0.0 0.0 800.0 120.0
 
-        g =
+        graphData =
             Graph.GraphData source target "black" "white"
     in
-        ( Model Running 0 1 b b [ b ] "Good luck!" g "Simulator on!", Cmd.none )
+        ( Model Running 0 1 b b [ b ] "Good luck!" "Simulator on!" graphData, Cmd.none )
 
 
 
@@ -121,7 +117,7 @@ updateModel n model =
         { model
             | gameState = newGameState
             , count = newCount
-            , register = n
+            , dieFace = n
             , balance = newBalance
             , history = newHistory
             , info = newHistory |> List.take 40 |> List.reverse |> intList2String
@@ -148,7 +144,7 @@ update msg model =
 -}
 dieClass : Model -> Attribute Msg
 dieClass model =
-    if model.register % 2 == 0 then
+    if model.dieFace % 2 == 0 then
         class "green"
     else
         class "red"
@@ -186,7 +182,7 @@ subscriptions model =
 
 
 {-|
-  The main graphing function: graphs the current game history
+  The main graphing function:displays graph of the current game history
 -}
 graph : Model -> String -> Svg.Svg msg
 graph model color =
@@ -207,7 +203,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ div [ balanceClass model ] [ text ("Bal " ++ (toString model.balance)) ]
-        , div [ dieClass model ] [ text ("Die " ++ (toString model.register)) ]
+        , div [ dieClass model ] [ text ("Die " ++ (toString model.dieFace)) ]
         , div [ class "display" ] [ text ("Count " ++ (toString model.count)) ]
         , button [ onClick Roll ] [ text "Roll" ]
         , button [ onClick Reset, id "reset" ] [ text "Reset" ]
@@ -219,7 +215,8 @@ view model =
             [ SA.width "1200", SA.height "400" ]
             [ (graph model "yellow")
             , (Graph.boundingRect model.graphData)
-            , (Graph.render "red" model.graphData [ ( 0, (toFloat model.initialBalance) ), ( 200.0, (toFloat model.initialBalance) ) ])
+              -- , (Graph.renderPointList "red" model.graphData [ ( 0, (toFloat model.initialBalance) ), ( 200.0, (toFloat model.initialBalance) ) ])
+            , (Graph.line "red" model.graphData 0.0 (toFloat model.initialBalance) 200.0 (toFloat model.initialBalance))
             , (graph model "yellow")
             ]
         ]

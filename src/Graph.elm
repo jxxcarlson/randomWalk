@@ -14,7 +14,7 @@ where we assume the time intervals between data points are equal.
 
 The main functions are
 
-  (1)  Graph.render "yellow" graphData data
+  (1)  Graph.renderPointList "yellow" graphData data
 
   (2)  Graph.renderTimeSeries "blue" graphData data
 
@@ -201,13 +201,18 @@ data2SVG data graphData =
             |> String.join " "
 
 
-{-| render "yellow" graphData [(0.0, 0.0), (100.0, 20.0), (200.0, 0.0)]
+{-| renderPointList "yellow" graphData [(0.0, 0.0), (100.0, 20.0), (200.0, 0.0)]
   produces an SVG representation of the given polygonal path.
 -}
-render : String -> GraphData -> Points -> S.Svg msg
-render color graphData data =
+renderPointList : String -> GraphData -> Points -> S.Svg msg
+renderPointList color graphData data =
     -- polyline [ fill "none", stroke "red", points (data2SVG data) ] []
     polyline [ fill "none", stroke color, points (data2SVG data graphData) ] []
+
+
+line : String -> GraphData -> Float -> Float -> Float -> Float -> S.Svg msg
+line color graphData x1 y1 x2 y2 =
+    renderPointList color graphData [ ( x1, y1 ), ( x2, y2 ) ]
 
 
 {-| renderTimeSeries "yellow" graphData [1.0, 1.2, 3.1, 2.2, ..)]
@@ -216,7 +221,7 @@ render color graphData data =
 -}
 renderTimeSeries : String -> GraphData -> List Float -> S.Svg msg
 renderTimeSeries color graphData data =
-    data |> timeSeries |> render color graphData
+    data |> timeSeries |> renderPointList color graphData
 
 
 {-| renderIntegerTimeSeries "yellow" graphData [1, 2, 3, 2, ..)]
@@ -225,4 +230,4 @@ renderTimeSeries color graphData data =
 -}
 renderIntegerTimeSeries : String -> GraphData -> List Int -> S.Svg msg
 renderIntegerTimeSeries color graphData data =
-    data |> List.map toFloat |> timeSeries |> render color graphData
+    data |> List.map toFloat |> timeSeries |> renderPointList color graphData
