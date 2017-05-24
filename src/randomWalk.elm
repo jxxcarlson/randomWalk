@@ -203,7 +203,7 @@ graph : Model -> String -> Svg.Svg msg
 graph model color =
     model.history
         |> List.reverse
-        |> Graph.drawIntegerTimeSeries color model.graphData
+        |> Graph.drawIntegerTimeSeries model.graphData color
 
 
 {-|
@@ -230,8 +230,8 @@ view model =
             [ SA.width "1200", SA.height "400" ]
             [ (graph model "yellow")
             , (Graph.boundingRect model.graphData)
-            , (Graph.drawLine "red"
-                model.graphData
+            , (Graph.drawLine model.graphData
+                "red"
                 0.0
                 (toFloat model.initialBalance)
                 200.0

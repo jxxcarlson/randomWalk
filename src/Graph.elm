@@ -14,7 +14,7 @@ where we assume the time intervals between data points are equal.
 
 The main functions are
 
-  (1)  Graph.drawPointList "yellow" graphData data
+  (1)  Graph.drawPointList graphData "yellow" data
 
   (2)  Graph.drawTimeSeries "blue" graphData data
 
@@ -186,8 +186,8 @@ point2String point =
   => "0,2  1,4  2,3"
   data2SVG : GraphData -> Svg Msg
 -}
-data2SVG : Points -> GraphData -> String
-data2SVG data graphData =
+data2SVG : GraphData -> Points -> String
+data2SVG graphData data =
     let
         affData =
             affineTransformData graphData
@@ -201,38 +201,85 @@ data2SVG data graphData =
             |> String.join " "
 
 
-{-| drawPointList "yellow" graphData [(0.0, 0.0), (100.0, 20.0), (200.0, 0.0)]
+{-| drawPointList graphData "yellow" [(0.0, 0.0), (100.0, 20.0), (200.0, 0.0)]
   produces an SVG representation of the given polygonal path.
 -}
-drawPointList : String -> GraphData -> Points -> S.Svg msg
-drawPointList color graphData data =
+drawPointList : GraphData -> String -> Points -> S.Svg msg
+drawPointList graphData color data =
     -- polyline [ fill "none", stroke "red", points (data2SVG data) ] []
-    polyline [ fill "none", stroke color, points (data2SVG data graphData) ] []
+    polyline [ fill "none", stroke color, points (data2SVG graphData data) ] []
 
 
 drawPolygon : GraphData -> String -> String -> Float -> Points -> S.Svg msg
 drawPolygon graphData strokeColor fillColor opacityValue data =
-    polygon [ fill fillColor, stroke strokeColor, opacity (toString opacityValue), points (data2SVG data graphData) ] []
+    polygon [ fill fillColor, stroke strokeColor, opacity (toString opacityValue), points (data2SVG graphData data) ] []
 
 
-drawLine : String -> GraphData -> Float -> Float -> Float -> Float -> S.Svg msg
-drawLine color graphData x1 y1 x2 y2 =
-    drawPointList color graphData [ ( x1, y1 ), ( x2, y2 ) ]
+drawRect : GraphData -> String -> String -> Float -> Float -> Float -> Float -> Float -> S.Svg msg
+drawRect graphData strokeColor fillColor opacityValue x y width height =
+    let
+        vertices =
+            [ ( x, y ), ( x + width, y ), ( x + width, y + height ), ( x, y + height ) ]
+    in
+        polygon [ fill fillColor, stroke strokeColor, opacity (toString opacityValue), points (data2SVG graphData vertices) ] []
+
+
+drawEllipse : GraphData -> String -> String -> Float -> Float -> Float -> Float -> Float -> S.Svg msg
+drawEllipse graphData strokeColor fillColor opacityValue x y rx ry =
+    let
+        center =
+            ( x, y )
+
+        affData =
+            affineTransformData graphData
+
+        aff =
+            affineTransformPoint affData
+
+        ( xx, yy ) =
+            aff center
+
+        rxx =
+            abs (affData.a) * rx
+
+        ryy =
+            abs (affData.c) * ry
+    in
+        ellipse
+            [ fill fillColor
+            , stroke strokeColor
+            , opacity (toString opacityValue)
+            , SA.cx (toString xx)
+            , SA.cy (toString yy)
+            , SA.rx (toString (rxx))
+            , SA.ry (toString (ryy))
+            ]
+            []
+
+
+drawCircle : GraphData -> String -> String -> Float -> Float -> Float -> Float -> S.Svg msg
+drawCircle graphData strokeColor fillColor opacityValue x y r =
+    drawEllipse graphData strokeColor fillColor opacityValue x y r r
+
+
+drawLine : GraphData -> String -> Float -> Float -> Float -> Float -> S.Svg msg
+drawLine graphData color x1 y1 x2 y2 =
+    drawPointList graphData color [ ( x1, y1 ), ( x2, y2 ) ]
 
 
 {-| drawTimeSeries "yellow" graphData [1.0, 1.2, 3.1, 2.2, ..)]
   produces an SVG representation the polgonal path
   [(0, 1.0), (1, 1.2), (2, 3.1), (3, 2.2), ..)]
 -}
-drawTimeSeries : String -> GraphData -> List Float -> S.Svg msg
-drawTimeSeries color graphData data =
-    data |> timeSeries |> drawPointList color graphData
+drawTimeSeries : GraphData -> String -> List Float -> S.Svg msg
+drawTimeSeries graphData color data =
+    data |> timeSeries |> drawPointList graphData color
 
 
 {-| drawIntegerTimeSeries "yellow" graphData [1, 2, 3, 2, ..)]
   produces an SVG representation the polgonal path
   [(0, 1), (1, 2), (2, 3), (3, 2), ..)]
 -}
-drawIntegerTimeSeries : String -> GraphData -> List Int -> S.Svg msg
-drawIntegerTimeSeries color graphData data =
-    data |> List.map toFloat |> timeSeries |> drawPointList color graphData
+drawIntegerTimeSeries : GraphData -> String -> List Int -> S.Svg msg
+drawIntegerTimeSeries graphData color data =
+    data |> List.map toFloat |> timeSeries |> drawPointList graphData color

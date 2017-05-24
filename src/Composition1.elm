@@ -15,99 +15,123 @@ main =
     S.svg
         [ SA.width "1200", SA.height "1200" ]
         [ (G.boundingRect graphData)
-        , (drawPolygon "blue" 0.5 [ ( 5.0, 5.0 ), ( 70.0, 7.0 ), ( 40.0, 10.0 ) ])
+        , square
+        , redCircle2
+        , redCircle3
+        , rectangle5
+        , rectangle4
+        , rectangle3
+        , circle5
+        , circle6
+        , blueCircle
+        , circle4
+        , greenCircle
+        , yellowEllipse
+        , horizontalRectangle
+        , verticalRectangle
+        , verticalRectangle2
         ]
 
 
 source =
-    G.Rect 0.0 0.0 200.0 20.0
+    G.Rect 0.0 0.0 200.0 200.0
 
 
 target =
-    G.Rect 20.0 20.0 600.0 600.0
+    G.Rect 60.0 60.0 500.0 500.0
 
 
 graphData =
-    G.GraphData source target "#f5f5f5" "black"
+    G.GraphData source target "#ffffff" "black"
 
 
-drawPolygon =
-    G.drawPolygon graphData "none"
+drawPoly =
+    G.drawPolygon graphData
 
 
+paintPoly =
+    drawPoly "none"
 
--- square =
---     rect
---         [ x "10"
---         , y "10"
---         , width "150"
---         , height "165"
---         , fill "rgba(200,200,255,0.6)"
---         ]
---         []
---
---
--- redCircle =
---     circle [ fill "#FF0000", cx "60", cy "60", r "30", opacity "0.5" ] []
---
---
--- blueCircle =
---     circle
---         [ fill "#5050FF"
---         , cx "113"
---         , cy "60"
---         , r "45"
---         , transform (G.translate 28.1 0.1)
---         , opacity "0.7"
---         ]
---         []
---
---
--- yellowEllipse =
---     circle
---         [ fill "rgba(240,240,10,0.5)"
---         , cx "60"
---         , cy "120"
---         , r "30"
---         , G.transform commands
---         ]
---         []
---
---
--- commands =
---     [ G.translate 60.0 120.0, G.scale 1.3 2.5, G.translate -60.0 -130.0 ]
---
---
--- redCircle2 =
---     circle
---         [ fill "rgba(240,0,10,0.8)"
---         , cx "120"
---         , cy "120"
---         , r "30"
---         , transform (G.scaleAt 120 120 1.1 0.9)
---         ]
---         []
---
---
--- verticalRectangle =
---     rect
---         [ x "40"
---         , y "50"
---         , height "140"
---         , width "20"
---         , stroke "black"
---         , fill "rgba(240,0,10,0.1)"
---         ]
---         []
---
---
--- horizontalRectangle =
---     rect
---         [ x "30"
---         , y "130"
---         , height "20"
---         , width "180"
---         , stroke "black"
---         , fill "rgba(240,0,10,0.1)"
---         ]
---         []
+
+drawRect =
+    G.drawRect graphData
+
+
+paintRect =
+    drawRect "none"
+
+
+drawEllipse =
+    G.drawEllipse graphData
+
+
+paintEllipse =
+    G.drawEllipse graphData "none"
+
+
+drawCircle =
+    G.drawCircle graphData
+
+
+paintCircle =
+    G.drawCircle graphData "none"
+
+
+square =
+    paintRect "rgb(160,160,255)" 0.8 0.0 0.0 200.0 200.0
+
+
+blueCircle =
+    paintCircle "#5050FF" 0.7 141.1 59.0 59.0
+
+
+greenCircle =
+    paintCircle "#00FF00" 0.6 30.0 40.0 40.0
+
+
+yellowEllipse =
+    paintEllipse "rgb(240,240,10)" 0.6 60.0 120.0 43.0 75.0
+
+
+redCircle2 =
+    paintCircle "rgb(240,0,10)" 0.8 60.0 160.0 25.0
+
+
+redCircle3 =
+    paintCircle "rgb(240,0,10)" 1.0 80.0 120.0 13.0
+
+
+circle4 =
+    paintCircle "rgb(40,0,240)" 1.0 125.0 90.0 18.0
+
+
+circle5 =
+    paintCircle "rgb(40,0,240)" 1.0 170.0 34.0 9.0
+
+
+circle6 =
+    paintCircle "rgb(0,0,0)" 1.0 140.0 130.0 6.0
+
+
+horizontalRectangle =
+    G.drawRect graphData "black" "rgb(240,0,10)" 0.4 10 10 180 15
+
+
+verticalRectangle =
+    G.drawRect graphData "black" "rgb(240,0,10)" 0.3 40 4 10 190
+
+
+verticalRectangle2 =
+    G.drawRect graphData "black" "rgb(240,0,10)" 0.2 15 4 10 160
+
+
+rectangle3 =
+    G.drawRect graphData "none" "rgb(0,120,240)" 0.3 120 25 60 150
+
+
+rectangle4 =
+    G.drawRect graphData "none" "rgb(150,120,240)" 0.7 135 10 50 185
+
+
+rectangle5 =
+    G.drawRect graphData "none" "rgb(140,100,255)" 0.7 155 5 40 180
