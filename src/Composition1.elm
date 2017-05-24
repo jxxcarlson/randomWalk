@@ -6,22 +6,33 @@
 
 module Main exposing (..)
 
-import Svg exposing (..)
-import Svg.Attributes exposing (..)
-import Graph as G exposing (..)
+import Svg as S exposing (..)
+import Svg.Attributes as SA exposing (..)
+import Graph as G
 
 
 main =
-    svg
-        [ viewBox "0 0 400 400" ]
-        [-- square
-         -- , redCircle
-         -- , blueCircle
-         -- , yellowEllipse
-         -- , redCircle2
-         -- , verticalRectangle
-         -- , horizontalRectangle
+    S.svg
+        [ SA.width "1200", SA.height "1200" ]
+        [ (G.boundingRect graphData)
+        , (drawPolygon "blue" 0.5 [ ( 5.0, 5.0 ), ( 70.0, 7.0 ), ( 40.0, 10.0 ) ])
         ]
+
+
+source =
+    G.Rect 0.0 0.0 200.0 20.0
+
+
+target =
+    G.Rect 20.0 20.0 600.0 600.0
+
+
+graphData =
+    G.GraphData source target "#f5f5f5" "black"
+
+
+drawPolygon =
+    G.drawPolygon graphData "none"
 
 
 
