@@ -6,7 +6,12 @@ import Html.Attributes exposing (class, id)
 import Svg exposing (svg, circle)
 import Svg.Attributes as SA exposing (cx, cy, fill, width, height, r)
 import Random
-import Graph exposing (renderPointList, renderIntegerTimeSeries, line)
+import Graph
+    exposing
+        ( drawPointList
+        , drawIntegerTimeSeries
+        , drawLine
+        )
 
 
 main =
@@ -43,7 +48,7 @@ type alias Model =
 init : ( Model, Cmd Msg )
 init =
     let
-        b =
+        initialBalance =
             4
 
         source =
@@ -55,7 +60,17 @@ init =
         graphData =
             Graph.GraphData source target "black" "white"
     in
-        ( Model Running 0 1 b b [ b ] "Good luck!" "Simulator on!" graphData, Cmd.none )
+        ( Model Running
+            0
+            1
+            initialBalance
+            initialBalance
+            [ initialBalance ]
+            "Good luck!"
+            "Simulator on!"
+            graphData
+        , Cmd.none
+        )
 
 
 
@@ -188,7 +203,7 @@ graph : Model -> String -> Svg.Svg msg
 graph model color =
     model.history
         |> List.reverse
-        |> Graph.renderIntegerTimeSeries color model.graphData
+        |> Graph.drawIntegerTimeSeries color model.graphData
 
 
 {-|
@@ -215,8 +230,13 @@ view model =
             [ SA.width "1200", SA.height "400" ]
             [ (graph model "yellow")
             , (Graph.boundingRect model.graphData)
-              -- , (Graph.renderPointList "red" model.graphData [ ( 0, (toFloat model.initialBalance) ), ( 200.0, (toFloat model.initialBalance) ) ])
-            , (Graph.line "red" model.graphData 0.0 (toFloat model.initialBalance) 200.0 (toFloat model.initialBalance))
+            , (Graph.drawLine "red"
+                model.graphData
+                0.0
+                (toFloat model.initialBalance)
+                200.0
+                (toFloat model.initialBalance)
+              )
             , (graph model "yellow")
             ]
         ]

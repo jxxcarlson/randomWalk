@@ -1,7 +1,32 @@
 module Graph exposing (..)
 
-{-| Module Graph provides a set of functions for
-constructing simple graphs, give a sequence of points
+{-| The  2DGraphics module provides a set of functions for
+drawing lines, circles, rectangles, and polygons, as well
+as constructing simple graphs.
+
+# Basic Graphics:
+@docs Point, Points, Rect, and GraphData are the data structures used:
+
+  (1.0, -3.2) is a Point
+  [(1.0, -3.2), (7.0. 0.4)] is a Points structure
+  [ x: 2.0, y: 3.1, width: 4.0, height: 10.0] is a Rect
+
+  GraphData is a record with sourceRect and targetRect fields,
+  and a few others (colors).  The sourceRect defines a rectangle
+  in the Cartesian plane that you, the user, employ just as in
+  a high school math class.  The targetRect represents the rectangle
+  rendered on your computer screen.
+
+# Transformations
+@docs AffineTransformData, affineTransformData, boundingRect
+
+AffineTransformData,
+affineTransformData graphData
+affineTransformPoint affineTransformData point
+affineTransformPoints affineTransformData points
+
+
+, give a sequence of points
 like
 
   data = [(0.0, 0.0), (5.0, 7.0), (8.0, 2.0), ...]
@@ -14,11 +39,11 @@ where we assume the time intervals between data points are equal.
 
 The main functions are
 
-  (1)  Graph.renderPointList "yellow" graphData data
+  (1)  Graph.drawPointList "yellow" graphData data
 
-  (2)  Graph.renderTimeSeries "blue" graphData data
+  (2)  Graph.drawTimeSeries "blue" graphData data
 
-  (3)  Graph.renderIntegerTimeSeries "blue" graphData data
+  (3)  Graph.drawIntegerTimeSeries "blue" graphData data
 
 where (1) is for sequences of points, (2) is for seqeunces of integers,
 and (3) is for sequences of floats.
@@ -186,8 +211,8 @@ point2String point =
   => "0,2  1,4  2,3"
   data2SVG : GraphData -> Svg Msg
 -}
-data2SVG : Points -> GraphData -> String
-data2SVG data graphData =
+data2SVG : GraphData -> Points -> String
+data2SVG graphData data =
     let
         affData =
             affineTransformData graphData
@@ -201,33 +226,79 @@ data2SVG data graphData =
             |> String.join " "
 
 
-{-| renderPointList "yellow" graphData [(0.0, 0.0), (100.0, 20.0), (200.0, 0.0)]
+{-| drawPointList "yellow" graphData [(0.0, 0.0), (100.0, 20.0), (200.0, 0.0)]
   produces an SVG representation of the given polygonal path.
 -}
-renderPointList : String -> GraphData -> Points -> S.Svg msg
-renderPointList color graphData data =
-    -- polyline [ fill "none", stroke "red", points (data2SVG data) ] []
-    polyline [ fill "none", stroke color, points (data2SVG data graphData) ] []
+drawPointList : String -> GraphData -> Points -> S.Svg msg
+drawPointList color graphData data =
+    polyline [ fill "none", stroke color, points (data2SVG graphData data) ] []
 
 
-line : String -> GraphData -> Float -> Float -> Float -> Float -> S.Svg msg
-line color graphData x1 y1 x2 y2 =
-    renderPointList color graphData [ ( x1, y1 ), ( x2, y2 ) ]
+drawPolygon : String -> String -> Float -> GraphData -> Points -> S.Svg msg
+drawPolygon fillColor strokeColor opac graphData data =
+    polygon [ fill fillColor, stroke strokeColor, opacity (toString opac), points (data2SVG graphData data) ] []
 
 
-{-| renderTimeSeries "yellow" graphData [1.0, 1.2, 3.1, 2.2, ..)]
+drawRect : String -> String -> Float -> GraphData -> Float -> Float -> Float -> Float -> S.Svg msg
+drawRect fillColor strokeColor opac graphData x y width height =
+    let
+        vertices =
+            [ ( x, y ), ( x + width, y ), ( x + width, y + height ), ( x, y + height ) ]
+    in
+        polygon [ fill fillColor, stroke strokeColor, opacity (toString opac), points (data2SVG graphData vertices) ] []
+
+
+drawLine : String -> GraphData -> Float -> Float -> Float -> Float -> S.Svg msg
+drawLine color graphData x1 y1 x2 y2 =
+    drawPointList color graphData [ ( x1, y1 ), ( x2, y2 ) ]
+
+
+drawCircle : String -> String -> Float -> GraphData -> Float -> Float -> Float -> S.Svg msg
+drawCircle fillColor strokeColor opac graphData x y r =
+    let
+        affData =
+            affineTransformData graphData
+
+        aff =
+            affineTransformPoint affData
+
+        center =
+            ( x, y )
+
+        ( xx, yy ) =
+            aff center
+
+        rr =
+            r
+
+        --r * sqrt (affData.a * affData.c)
+        -- ^^^ geometric mean
+        -- circle [ fill "red", SA.opacity "0.5", cx "120", cy "60", r "50" ] []
+    in
+        S.circle
+            [ fill fillColor
+            , stroke strokeColor
+            , SA.opacity (toString opac)
+            , SA.cx (toString xx)
+            , SA.cy (toString yy)
+            , SA.r (toString rr)
+            ]
+            []
+
+
+{-| drawTimeSeries "yellow" graphData [1.0, 1.2, 3.1, 2.2, ..)]
   produces an SVG representation the polgonal path
   [(0, 1.0), (1, 1.2), (2, 3.1), (3, 2.2), ..)]
 -}
-renderTimeSeries : String -> GraphData -> List Float -> S.Svg msg
-renderTimeSeries color graphData data =
-    data |> timeSeries |> renderPointList color graphData
+drawTimeSeries : String -> GraphData -> List Float -> S.Svg msg
+drawTimeSeries color graphData data =
+    data |> timeSeries |> drawPointList color graphData
 
 
-{-| renderIntegerTimeSeries "yellow" graphData [1, 2, 3, 2, ..)]
+{-| drawIntegerTimeSeries "yellow" graphData [1, 2, 3, 2, ..)]
   produces an SVG representation the polgonal path
   [(0, 1), (1, 2), (2, 3), (3, 2), ..)]
 -}
-renderIntegerTimeSeries : String -> GraphData -> List Int -> S.Svg msg
-renderIntegerTimeSeries color graphData data =
-    data |> List.map toFloat |> timeSeries |> renderPointList color graphData
+drawIntegerTimeSeries : String -> GraphData -> List Int -> S.Svg msg
+drawIntegerTimeSeries color graphData data =
+    data |> List.map toFloat |> timeSeries |> drawPointList color graphData
