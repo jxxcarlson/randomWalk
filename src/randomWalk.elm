@@ -3,6 +3,7 @@ module Main exposing (..)
 import Html exposing (..)
 import Html.Events exposing (..)
 import Html.Attributes exposing (class, id)
+import Time exposing (Time, second)
 import Svg exposing (svg, circle)
 import Svg.Attributes as SA exposing (cx, cy, fill, width, height, r)
 import Random
@@ -28,12 +29,18 @@ type GameState
     | GameOver
 
 
+type RunMode
+    = Manual
+    | Automatic
+
+
 
 -- MODEL
 
 
 type alias Model =
     { gameState : GameState
+    , runMode : RunMode
     , count : Int
     , dieFace : Int
     , initialBalance : Int
@@ -61,6 +68,7 @@ init =
             Graph.GraphData source target "black" "white"
     in
         ( Model Running
+            Manual
             0
             1
             initialBalance
@@ -81,6 +89,8 @@ type Msg
     = Roll
     | NewFace Int
     | Reset
+    | Run
+    | Tick Time
 
 
 updateModel : Int -> Model -> Model
@@ -152,6 +162,15 @@ update msg model =
         Reset ->
             init
 
+        Run ->
+            ( { model | runMode = Automatic }, Cmd.none )
+
+        Tick newTime ->
+            if model.runMode == Automatic && model.gameState == Running then
+                ( model, Random.generate NewFace (Random.int 1 6) )
+            else
+                ( model, Cmd.none )
+
 
 {-|
   The next three functions change the color of text elements
@@ -189,7 +208,7 @@ messageClass model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    Time.every second Tick
 
 
 
@@ -222,6 +241,7 @@ view model =
         , div [ class "display" ] [ text ("Count " ++ (toString model.count)) ]
         , button [ onClick Roll ] [ text "Roll" ]
         , button [ onClick Reset, id "reset" ] [ text "Reset" ]
+        , button [ onClick Run, id "run" ] [ text "Run" ]
         , br [] []
         , br [] []
         , div [ messageClass model ] [ text model.message ]
