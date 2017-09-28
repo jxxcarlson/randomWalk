@@ -9631,36 +9631,35 @@ var _user$project$Graph$AffineTransformData = F4(
 	function (a, b, c, d) {
 		return {a: a, b: b, c: c, d: d};
 	});
-var _user$project$Main$labelStyle = _elm_lang$html$Html_Attributes$style(
-	{
+var _user$project$Main$labelStyle = {
+	ctor: '::',
+	_0: {ctor: '_Tuple2', _0: 'height', _1: '20px'},
+	_1: {
 		ctor: '::',
-		_0: {ctor: '_Tuple2', _0: 'height', _1: '20px'},
+		_0: {ctor: '_Tuple2', _0: 'width', _1: '55px'},
 		_1: {
 			ctor: '::',
-			_0: {ctor: '_Tuple2', _0: 'width', _1: '55px'},
+			_0: {ctor: '_Tuple2', _0: 'background-color', _1: 'black'},
 			_1: {
 				ctor: '::',
-				_0: {ctor: '_Tuple2', _0: 'background-color', _1: 'black'},
+				_0: {ctor: '_Tuple2', _0: 'color', _1: 'white'},
 				_1: {
 					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'color', _1: 'white'},
+					_0: {ctor: '_Tuple2', _0: 'margin-bottom', _1: '10px'},
 					_1: {
 						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'margin-bottom', _1: '10px'},
+						_0: {ctor: '_Tuple2', _0: 'font-size', _1: '10pt'},
 						_1: {
 							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'font-size', _1: '10pt'},
-							_1: {
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'padding', _1: '5px 8px 0px 8px'},
-								_1: {ctor: '[]'}
-							}
+							_0: {ctor: '_Tuple2', _0: 'padding', _1: '5px 8px 0px 8px'},
+							_1: {ctor: '[]'}
 						}
 					}
 				}
 			}
 		}
-	});
+	}
+};
 var _user$project$Main$buttonStyle = _elm_lang$html$Html_Attributes$style(
 	{
 		ctor: '::',
@@ -9733,13 +9732,33 @@ var _user$project$Main$messageClass = function (model) {
 			},
 			_user$project$Main$defaultMessageStyle));
 };
-var _user$project$Main$balanceClass = function (model) {
-	return (_elm_lang$core$Native_Utils.cmp(model.balance, model.initialBalance) > -1) ? _elm_lang$svg$Svg_Attributes$class('green') : (((_elm_lang$core$Native_Utils.cmp(model.balance, model.initialBalance) < 0) && (_elm_lang$core$Native_Utils.cmp(model.balance, 0) > 0)) ? _elm_lang$svg$Svg_Attributes$class('yellow') : _elm_lang$svg$Svg_Attributes$class('red'));
+var _user$project$Main$balanceStyle = function (model) {
+	return (_elm_lang$core$Native_Utils.cmp(model.balance, model.initialBalance) > -1) ? {
+		ctor: '::',
+		_0: {ctor: '_Tuple2', _0: 'background-color', _1: 'green'},
+		_1: {ctor: '[]'}
+	} : (((_elm_lang$core$Native_Utils.cmp(model.balance, model.initialBalance) < 0) && (_elm_lang$core$Native_Utils.cmp(model.balance, 0) > 0)) ? {
+		ctor: '::',
+		_0: {ctor: '_Tuple2', _0: 'background-color', _1: 'orange'},
+		_1: {ctor: '[]'}
+	} : {
+		ctor: '::',
+		_0: {ctor: '_Tuple2', _0: 'background-color', _1: 'red'},
+		_1: {ctor: '[]'}
+	});
 };
-var _user$project$Main$dieClass = function (model) {
+var _user$project$Main$dieStyle = function (model) {
 	return _elm_lang$core$Native_Utils.eq(
 		A2(_elm_lang$core$Basics_ops['%'], model.dieFace, 2),
-		0) ? _elm_lang$svg$Svg_Attributes$class('green') : _elm_lang$svg$Svg_Attributes$class('red');
+		0) ? {
+		ctor: '::',
+		_0: {ctor: '_Tuple2', _0: 'background-color', _1: 'green'},
+		_1: {ctor: '[]'}
+	} : {
+		ctor: '::',
+		_0: {ctor: '_Tuple2', _0: 'background-color', _1: 'red'},
+		_1: {ctor: '[]'}
+	};
 };
 var _user$project$Main$Model = function (a) {
 	return function (b) {
@@ -9797,7 +9816,7 @@ var _user$project$Main$init = function () {
 	var initialBalance = 4;
 	return {
 		ctor: '_Tuple2',
-		_0: _user$project$Main$Model(_user$project$Main$Running)(_user$project$Main$Manual)(0)(1)(initialBalance)(initialBalance)(
+		_0: _user$project$Main$Model(_user$project$Main$Running)(_user$project$Main$Manual)(0)(2)(initialBalance)(initialBalance)(
 			{
 				ctor: '::',
 				_0: initialBalance,
@@ -9897,7 +9916,11 @@ var _user$project$Main$view = function (model) {
 				_elm_lang$html$Html$div,
 				{
 					ctor: '::',
-					_0: _user$project$Main$labelStyle,
+					_0: _elm_lang$html$Html_Attributes$style(
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_user$project$Main$labelStyle,
+							_user$project$Main$balanceStyle(model))),
 					_1: {ctor: '[]'}
 				},
 				{
@@ -9915,7 +9938,11 @@ var _user$project$Main$view = function (model) {
 					_elm_lang$html$Html$div,
 					{
 						ctor: '::',
-						_0: _user$project$Main$labelStyle,
+						_0: _elm_lang$html$Html_Attributes$style(
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								_user$project$Main$labelStyle,
+								_user$project$Main$dieStyle(model))),
 						_1: {ctor: '[]'}
 					},
 					{
@@ -9933,12 +9960,8 @@ var _user$project$Main$view = function (model) {
 						_elm_lang$html$Html$div,
 						{
 							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$class('display'),
-							_1: {
-								ctor: '::',
-								_0: _user$project$Main$labelStyle,
-								_1: {ctor: '[]'}
-							}
+							_0: _elm_lang$html$Html_Attributes$style(_user$project$Main$labelStyle),
+							_1: {ctor: '[]'}
 						},
 						{
 							ctor: '::',

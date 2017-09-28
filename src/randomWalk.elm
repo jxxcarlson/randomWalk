@@ -70,7 +70,7 @@ init =
         ( Model Running
             Manual
             0
-            1
+            2
             initialBalance
             initialBalance
             [ initialBalance ]
@@ -175,22 +175,20 @@ update msg model =
 {-| The next three functions change the color of text elements
 in accord with the state of the Game
 -}
-dieClass : Model -> Attribute Msg
-dieClass model =
+dieStyle model =
     if model.dieFace % 2 == 0 then
-        SA.class "green"
+        [ ( "background-color", "green" ) ]
     else
-        SA.class "red"
+        [ ( "background-color", "red" ) ]
 
 
-balanceClass : Model -> Attribute Msg
-balanceClass model =
+balanceStyle model =
     if model.balance >= model.initialBalance then
-        SA.class "green"
+        [ ( "background-color", "green" ) ]
     else if model.balance < model.initialBalance && model.balance > 0 then
-        SA.class "yellow"
+        [ ( "background-color", "orange" ) ]
     else
-        SA.class "red"
+        [ ( "background-color", "red" ) ]
 
 
 defaultMessageStyle =
@@ -246,9 +244,9 @@ view model =
             , ( "background-color", "#eee" )
             ]
         ]
-        [ div [ labelStyle ] [ text ("Bal " ++ (toString model.balance)) ]
-        , div [ labelStyle ] [ text ("Die " ++ (toString model.dieFace)) ]
-        , div [ SA.class "display", labelStyle ] [ text ("Count " ++ (toString model.count)) ]
+        [ div [ HA.style (labelStyle ++ balanceStyle model) ] [ text ("Bal " ++ (toString model.balance)) ]
+        , div [ HA.style (labelStyle ++ dieStyle model) ] [ text ("Die " ++ (toString model.dieFace)) ]
+        , div [ HA.style labelStyle ] [ text ("Count " ++ (toString model.count)) ]
         , button [ onClick Roll, buttonStyle ] [ text "Roll" ]
         , button [ onClick Reset, SA.id "reset", buttonStyle ] [ text "Reset" ]
         , button [ onClick Run, SA.id "run", buttonStyle ] [ text "Run" ]
@@ -283,12 +281,11 @@ buttonStyle =
 
 
 labelStyle =
-    HA.style
-        [ ( "height", "20px" )
-        , ( "width", "55px" )
-        , ( "background-color", "black" )
-        , ( "color", "white" )
-        , ( "margin-bottom", "10px" )
-        , ( "font-size", "10pt" )
-        , ( "padding", "5px 8px 0px 8px" )
-        ]
+    [ ( "height", "20px" )
+    , ( "width", "55px" )
+    , ( "background-color", "black" )
+    , ( "color", "white" )
+    , ( "margin-bottom", "10px" )
+    , ( "font-size", "10pt" )
+    , ( "padding", "5px 8px 0px 8px" )
+    ]
