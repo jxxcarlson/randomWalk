@@ -2,10 +2,10 @@ module Main exposing (..)
 
 import Html exposing (..)
 import Html.Events exposing (..)
-import Html.Attributes exposing (class, id)
+import Html.Attributes as HA exposing (class, id, style)
 import Time exposing (Time, second)
 import Svg exposing (svg, circle)
-import Svg.Attributes as SA exposing (cx, cy, fill, width, height, r)
+import Svg.Attributes as SA exposing (..)
 import Random
 import Graph
     exposing
@@ -172,34 +172,37 @@ update msg model =
                 ( model, Cmd.none )
 
 
-{-|
-  The next three functions change the color of text elements
-  in accord with the state of the Game
+{-| The next three functions change the color of text elements
+in accord with the state of the Game
 -}
 dieClass : Model -> Attribute Msg
 dieClass model =
     if model.dieFace % 2 == 0 then
-        class "green"
+        SA.class "green"
     else
-        class "red"
+        SA.class "red"
 
 
 balanceClass : Model -> Attribute Msg
 balanceClass model =
     if model.balance >= model.initialBalance then
-        class "green"
+        SA.class "green"
     else if model.balance < model.initialBalance && model.balance > 0 then
-        class "yellow"
+        SA.class "yellow"
     else
-        class "red"
+        SA.class "red"
+
+
+defaultMessageStyle =
+    [ ( "width", "200px" ), ( "padding", "8px" ) ]
 
 
 messageClass : Model -> Attribute Msg
 messageClass model =
     if model.balance == 0 then
-        class "red"
+        HA.style ([ ( "background-color", "red" ), ( "color", "white" ) ] ++ defaultMessageStyle)
     else
-        class "white"
+        HA.style ([ ( "background-color", "green" ), ( "color", "white" ) ] ++ defaultMessageStyle)
 
 
 
@@ -208,15 +211,14 @@ messageClass model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Time.every second Tick
+    Time.every (0.2 * second) Tick
 
 
 
 -- VIEW
 
 
-{-|
-  The main graphing function:displays graph of the current game history
+{-| The main graphing function:displays graph of the current game history
 -}
 graph : Model -> String -> Svg.Svg msg
 graph model color =
@@ -225,8 +227,7 @@ graph model color =
         |> Graph.drawIntegerTimeSeries model.graphData color
 
 
-{-|
-  intList2String [1, 4, 2, 7] = "1, 4, 2, 7"
+{-| intList2String [1, 4, 2, 7] = "1, 4, 2, 7"
 -}
 intList2String : List Int -> String
 intList2String list =
@@ -235,17 +236,26 @@ intList2String list =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ div [ balanceClass model ] [ text ("Bal " ++ (toString model.balance)) ]
-        , div [ dieClass model ] [ text ("Die " ++ (toString model.dieFace)) ]
-        , div [ class "display" ] [ text ("Count " ++ (toString model.count)) ]
-        , button [ onClick Roll ] [ text "Roll" ]
-        , button [ onClick Reset, id "reset" ] [ text "Reset" ]
-        , button [ onClick Run, id "run" ] [ text "Run" ]
+    div
+        [ HA.style
+            [ ( "margin-left", "35px" )
+            , ( "margin-top", "35px" )
+            , ( "padding", "45px 45px 45px 45px" )
+            , ( "width", "820px" )
+            , ( "height", "350px" )
+            , ( "background-color", "#eee" )
+            ]
+        ]
+        [ div [ labelStyle ] [ text ("Bal " ++ (toString model.balance)) ]
+        , div [ labelStyle ] [ text ("Die " ++ (toString model.dieFace)) ]
+        , div [ SA.class "display", labelStyle ] [ text ("Count " ++ (toString model.count)) ]
+        , button [ onClick Roll, buttonStyle ] [ text "Roll" ]
+        , button [ onClick Reset, SA.id "reset", buttonStyle ] [ text "Reset" ]
+        , button [ onClick Run, SA.id "run", buttonStyle ] [ text "Run" ]
         , br [] []
         , br [] []
         , div [ messageClass model ] [ text model.message ]
-        , p [ id "info" ] [ text model.info ]
+        , p [ SA.id "info" ] [ text model.info ]
         , svg
             [ SA.width "1200", SA.height "400" ]
             [ (graph model "yellow")
@@ -259,4 +269,26 @@ view model =
               )
             , (graph model "yellow")
             ]
+        ]
+
+
+buttonStyle =
+    HA.style
+        [ ( "height", "25px" )
+        , ( "background-color", "black" )
+        , ( "color", "white" )
+        , ( "margin-right", "10px" )
+        , ( "font-size", "12pt" )
+        ]
+
+
+labelStyle =
+    HA.style
+        [ ( "height", "20px" )
+        , ( "width", "55px" )
+        , ( "background-color", "black" )
+        , ( "color", "white" )
+        , ( "margin-bottom", "10px" )
+        , ( "font-size", "10pt" )
+        , ( "padding", "5px 8px 0px 8px" )
         ]
